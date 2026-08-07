@@ -3,20 +3,25 @@
 import { useState } from "react";
 
 import Welcome from "@/components/welcome/Welcome";
-import Hero from "@/components/hero/Hero";
-import Countdown from "@/components/countdown/Countdown";
+import Envelope from "@/components/envelope/Envelope";
+import Invitation from "@/components/invitation/Invitation";
 
 export default function Home() {
-  const [opened, setOpened] = useState(false);
+  const [step, setStep] = useState<"welcome" | "envelope" | "invitation">(
+    "welcome"
+  );
 
-  if (!opened) {
-    return <Welcome onOpen={() => setOpened(true)} />;
+  if (step === "welcome") {
+    return (
+      <Welcome onOpen={() => setStep("envelope")} />
+    );
   }
 
-  return (
-    <>
-      <Hero />
-      <Countdown />
-    </>
-  );
+  if (step === "envelope") {
+    return (
+      <Envelope onOpen={() => setStep("invitation")} />
+    );
+  }
+
+  return <Invitation />;
 }
