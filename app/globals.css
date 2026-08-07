@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  --ivory: #faf8f5;
+  --lavender: #b79ced;
+  --burgundy: #800020;
+  --gold: #d4af37;
+  --text: #2f2f2f;
+
+  --font-heading: serif;
+  --font-body: sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #faf8f5 60%,
+    #f6f2ec 100%
+  );
+  color: var(--text);
+  font-family: var(--font-body);
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+}
