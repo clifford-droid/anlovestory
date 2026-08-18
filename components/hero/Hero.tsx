@@ -1,79 +1,80 @@
-import { wedding } from "../../data/wedding";
+"use client";
+
+import { motion } from "framer-motion";
+import { wedding } from "@/data/wedding";
+
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-[#FAF8F5] to-[#F6F2EC] px-6">
+    <section className="min-h-screen flex items-center justify-center px-6 py-24 bg-gradient-to-b from-white via-[#FAF8F5] to-white">
 
-      {/* Top Left Decoration */}
-      <div className="absolute top-8 left-8 text-6xl opacity-20">
-        🌸
-      </div>
-
-      {/* Top Right Decoration */}
-      <div className="absolute top-8 right-8 text-6xl opacity-20">
-        🌸
-      </div>
-
-      {/* Bottom Left Decoration */}
-      <div className="absolute bottom-8 left-8 text-6xl opacity-20 rotate-180">
-        🌸
-      </div>
-
-      {/* Bottom Right Decoration */}
-      <div className="absolute bottom-8 right-8 text-6xl opacity-20 rotate-180">
-        🌸
-      </div>
-
-      <div className="text-center max-w-4xl">
-
-        <div className="inline-block border border-[#D4AF37] rounded-full px-8 py-3 mb-10">
-          <span className="text-[#D4AF37] tracking-[0.5em] text-xl">
-            NJ ♥ AN
-          </span>
+      <motion.div
+        initial={{ opacity: 0, y: 80 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 1.2,
+          ease: "easeOut",
+        }}
+        className="max-w-3xl w-full text-center"
+      >
+        {/* Decorative Line */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="h-px w-20 bg-[#D4AF37]" />
+          <span className="text-[#D4AF37] text-2xl">✦</span>
+          <div className="h-px w-20 bg-[#D4AF37]" />
         </div>
 
-        <p className="uppercase tracking-[0.4em] text-[#D4AF37] text-sm mb-5">
+        <p className="uppercase tracking-[0.45em] text-[#D4AF37] text-sm">
           Together with our Families
         </p>
 
-        <p className="italic text-gray-600 mb-10">
-          joyfully invite you to celebrate the beginning of our forever
-        </p>
+        <div className="my-10">
+          <h1 className="text-6xl md:text-8xl text-[#800020] leading-none">
+            {wedding.groom}
+          </h1>
 
-        <h1 className="text-6xl md:text-8xl text-[#800020] font-bold">
-          Nnamdi John
-        </h1>
+          <p className="text-5xl text-[#B79CED] my-6">&</p>
 
-        <p className="text-5xl text-[#B79CED] my-6">&</p>
-
-        <h1 className="text-6xl md:text-8xl text-[#800020] font-bold">
-          Angel Nwanyim
-        </h1>
-
-        <div className="mt-12 space-y-3">
-          <p className="text-2xl font-semibold text-gray-700">
-            Thursday, October 1, 2026
-          </p>
-
-          <p className="text-lg text-gray-600">
-            11:00 AM
-          </p>
-
-          <p className="text-gray-500">
-            New Planet Resorts Event Hall
-          </p>
-
-          <p className="text-gray-500">
-            133/135 Aka Road, Ajangbadi, Ojo, Lagos
-          </p>
+          <h1 className="text-6xl md:text-8xl text-[#800020] leading-none">
+            {wedding.bride}
+          </h1>
         </div>
 
-        <button
-          className="mt-12 rounded-full bg-[#800020] px-10 py-4 text-white font-semibold shadow-xl hover:scale-105 transition-all duration-300"
-        >
-          Open Invitation
-        </button>
+        <div className="space-y-3">
 
-      </div>
+          <p className="text-2xl text-gray-700">
+  {wedding.weddingDate}
+</p>
+
+<p className="text-lg text-gray-500">
+  {wedding.weddingTime}
+</p>
+
+          <p className="text-lg text-gray-500">
+           <>
+  <p className="text-lg text-gray-500">
+    {wedding.venue}
+  </p>
+
+  <p className="text-sm text-gray-400 mt-1">
+    {wedding.address}
+  </p>
+</>
+          </p>
+
+        </div>
+
+        {/* Bottom Ornament */}
+
+        <div className="flex items-center justify-center gap-4 mt-12">
+          <div className="h-px w-20 bg-[#D4AF37]" />
+          <span className="text-[#D4AF37] text-2xl">
+            ♥
+          </span>
+          <div className="h-px w-20 bg-[#D4AF37]" />
+        </div>
+
+      </motion.div>
+
     </section>
   );
 }
