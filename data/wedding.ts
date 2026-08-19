@@ -1,10 +1,10 @@
 export const wedding = {
-  groom: "Nnamdi John",
   bride: "Angel Nwanyim",
+  groom: "Nnamdi John",
 
   weddingDate: "Thursday, October 1, 2026",
 
-  weddingTime: "12:00 AM",
+  weddingTime: "12 Noon",
 
   venue: "New Planet Resorts Event Hall",
 

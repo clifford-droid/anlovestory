@@ -105,7 +105,7 @@ export default function MusicPlayer() {
     <>
       <audio
         ref={audioRef}
-        src="/music/Wedding-song.mp3"
+        src="/music/Heartbeat.mp3"
         preload="auto"
         loop
         playsInline
