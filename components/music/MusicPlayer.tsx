@@ -15,29 +15,28 @@ export default function MusicPlayer() {
     audio.loop = true;
 
     const startMusic = async () => {
-      if (audio.paused) {
-        try {
-          await audio.play();
-          setIsPlaying(true);
+      if (!audio.paused) return;
 
-          removeListeners();
-        } catch (error) {
-          console.log("Music playback blocked:", error);
-        }
+      try {
+        await audio.play();
+        setIsPlaying(true);
+        removeListeners();
+      } catch (error) {
+        console.log("Music playback blocked:", error);
       }
     };
 
     const removeListeners = () => {
-      window.removeEventListener("scroll", startMusic);
       window.removeEventListener("click", startMusic);
       window.removeEventListener("touchstart", startMusic);
-      window.removeEventListener("wheel", startMusic);
+      window.removeEventListener("pointerdown", startMusic);
     };
 
-    window.addEventListener("scroll", startMusic, { passive: true });
     window.addEventListener("click", startMusic);
-    window.addEventListener("touchstart", startMusic, { passive: true });
-    window.addEventListener("wheel", startMusic, { passive: true });
+    window.addEventListener("touchstart", startMusic, {
+      passive: true,
+    });
+    window.addEventListener("pointerdown", startMusic);
 
     return () => {
       removeListeners();
