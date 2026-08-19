@@ -4,7 +4,7 @@ export const wedding = {
 
   weddingDate: "Thursday, October 1, 2026",
 
-  weddingTime: "11:00 AM",
+  weddingTime: "12:00 AM",
 
   venue: "New Planet Resorts Event Hall",
 

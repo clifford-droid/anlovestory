@@ -56,7 +56,7 @@ export default function Envelope({ onOpen }: EnvelopeProps) {
             "
           >
             <div className="flex h-full items-center justify-center text-[#800020] text-3xl">
-              NJ ♥ AN
+              AN ♥ NJ
             </div>
           </motion.div>
 

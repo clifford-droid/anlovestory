@@ -45,7 +45,7 @@ export default async function InvitePage({
 
           <p className="mt-5 text-gray-500 leading-relaxed">
             This invitation has already been used to submit an RSVP.
-            Thank you for responding to Nnamdi & Angel.
+            Thank you for responding to Angel & Nnamdi.
           </p>
 
           <p className="mt-6 text-[#D4AF37] tracking-widest">

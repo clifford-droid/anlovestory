@@ -48,7 +48,7 @@ export default function WeddingDetails() {
             </h3>
 
             <p className="text-gray-600">
-              11:00 AM
+              12:00 AM
             </p>
           </motion.div>
 

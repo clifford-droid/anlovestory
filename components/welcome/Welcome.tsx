@@ -16,7 +16,7 @@ export default function Welcome({ onOpen }: WelcomeProps) {
 
         <div className="my-8">
           <h1 className="text-5xl text-[#800020]">
-            NJ ♥ AN
+            AN ♥ NJ
           </h1>
         </div>
 
