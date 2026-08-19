@@ -1,4 +1,5 @@
 import RSVPForm from "@/components/rsvp/RSVPForm";
+import MusicPlayer from "@/components/music/MusicPlayer";
 
 type RSVPPageProps = {
   searchParams: Promise<{
@@ -28,5 +29,9 @@ export default async function RSVPPage({
     );
   }
 
-  return <RSVPForm invitationCode={invitationCode} />;
-}
+  return (
+  <>
+    <MusicPlayer />
+    <RSVPForm invitationCode={invitationCode} />
+  </>
+);}

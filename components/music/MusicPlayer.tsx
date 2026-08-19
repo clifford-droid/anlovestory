@@ -13,68 +13,130 @@ export default function MusicPlayer() {
     if (!audio) return;
 
     audio.loop = true;
+    audio.volume = 1;
+    audio.muted = false;
+
+    const handlePlaying = () => {
+      setIsPlaying(true);
+    };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+    };
+
+    const handleError = () => {
+      setIsPlaying(false);
+      console.log("Audio could not be loaded.");
+    };
 
     const startMusic = async () => {
       if (!audio.paused) return;
 
       try {
+        audio.muted = false;
+        audio.volume = 1;
+
         await audio.play();
-        setIsPlaying(true);
-        removeListeners();
       } catch (error) {
-        console.log("Music playback blocked:", error);
+        console.log(
+          "Browser prevented automatic music playback:",
+          error
+        );
       }
     };
 
-    const removeListeners = () => {
-      window.removeEventListener("click", startMusic);
-      window.removeEventListener("touchstart", startMusic);
-      window.removeEventListener("pointerdown", startMusic);
-    };
+    audio.addEventListener("playing", handlePlaying);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("error", handleError);
 
-    window.addEventListener("click", startMusic);
-    window.addEventListener("touchstart", startMusic, {
-      passive: true,
-    });
-    window.addEventListener("pointerdown", startMusic);
+    // One genuine interaction is enough.
+    window.addEventListener(
+      "pointerdown",
+      startMusic,
+      { once: true }
+    );
 
     return () => {
-      removeListeners();
+      audio.removeEventListener(
+        "playing",
+        handlePlaying
+      );
+
+      audio.removeEventListener(
+        "pause",
+        handlePause
+      );
+
+      audio.removeEventListener(
+        "error",
+        handleError
+      );
+
+      window.removeEventListener(
+        "pointerdown",
+        startMusic
+      );
     };
   }, []);
 
-  const toggleMusic = async () => {
+  async function toggleMusic() {
     const audio = audioRef.current;
 
     if (!audio) return;
 
     if (audio.paused) {
       try {
+        audio.muted = false;
+        audio.volume = 1;
+
         await audio.play();
-        setIsPlaying(true);
       } catch (error) {
-        console.log("Music could not start:", error);
+        console.log(
+          "Music could not start:",
+          error
+        );
       }
     } else {
       audio.pause();
-      setIsPlaying(false);
     }
-  };
+  }
 
   return (
     <>
       <audio
         ref={audioRef}
         src="/music/Wedding-song.mp3"
-        loop
         preload="auto"
+        loop
+        playsInline
       />
 
       <motion.button
+        type="button"
         onClick={toggleMusic}
         whileTap={{ scale: 0.9 }}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#800020] text-white shadow-lg border-2 border-[#D4AF37] flex items-center justify-center"
-        aria-label={isPlaying ? "Pause music" : "Play music"}
+        aria-label={
+          isPlaying
+            ? "Pause wedding music"
+            : "Play wedding music"
+        }
+        className="
+          fixed
+          bottom-6
+          right-6
+          z-[100]
+          flex
+          h-14
+          w-14
+          items-center
+          justify-center
+          rounded-full
+          border-2
+          border-[#D4AF37]
+          bg-[#800020]
+          text-white
+          shadow-xl
+        "
       >
         <span className="text-xl">
           {isPlaying ? "❚❚" : "♫"}

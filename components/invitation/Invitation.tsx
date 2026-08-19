@@ -7,7 +7,6 @@ import Gallery from "@/components/Gallery/Gallery";
 import RSVP from "@/components/rsvp/RSVP";
 import Location from "@/components/location/Location";
 import Closing from "@/components/closing/Closing";
-import MusicPlayer from "@/components/music/MusicPlayer";
 import Footer from "@/components/footer/Footer";
 
 type InvitationProps = {
@@ -19,8 +18,6 @@ export default function Invitation({
 }: InvitationProps) {
   return (
     <>
-      <MusicPlayer />
-
       <Hero />
       <Countdown />
       <OurStory />

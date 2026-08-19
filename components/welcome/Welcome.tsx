@@ -7,9 +7,7 @@ type WelcomeProps = {
 export default function Welcome({ onOpen }: WelcomeProps) {
   return (
     <section className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-[#FAF8F5] to-white px-6">
-
       <div className="max-w-md w-full rounded-[32px] bg-white shadow-2xl border border-[#F2E6C9] p-10 text-center">
-
         <p className="uppercase tracking-[0.45em] text-[#D4AF37] text-sm">
           You Are Invited
         </p>
@@ -30,13 +28,15 @@ export default function Welcome({ onOpen }: WelcomeProps) {
 
         <div className="my-10">
           <h2 className="text-4xl text-[#800020]">
-            Nnamdi John
+            Angel Nwanyim
           </h2>
 
-          <p className="text-[#B79CED] text-2xl my-3">&</p>
+          <p className="text-[#B79CED] text-2xl my-3">
+            &
+          </p>
 
           <h2 className="text-4xl text-[#800020]">
-            Angel Nwanyim
+            Nnamdi John
           </h2>
         </div>
 
@@ -45,6 +45,7 @@ export default function Welcome({ onOpen }: WelcomeProps) {
         </p>
 
         <button
+          type="button"
           onClick={onOpen}
           className="
             mt-10
@@ -64,9 +65,7 @@ export default function Welcome({ onOpen }: WelcomeProps) {
         >
           Open Invitation
         </button>
-
       </div>
-
     </section>
   );
 }
