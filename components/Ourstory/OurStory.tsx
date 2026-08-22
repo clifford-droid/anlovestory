@@ -23,7 +23,7 @@ export default function OurStory() {
           >
             <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-xl bg-[#FAF8F5]">
               <img
-                src="/images/couple.jpg"
+                src="/images/couple.jpeg"
                 alt="Nnamdi and Angel"
                 className="w-full h-full object-cover"
               />

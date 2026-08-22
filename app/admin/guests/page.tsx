@@ -16,6 +16,7 @@ type Guest = {
   guest_name: string;
   phone: string | null;
   max_guests: number;
+  guest_category: "Regular" | "VIP";
   invitation_code: string;
   rsvp_submitted: boolean;
   created_at: string;
@@ -26,6 +27,8 @@ export default function GuestGeneratorPage() {
   const [guestName, setGuestName] = useState("");
   const [phone, setPhone] = useState("");
   const [maxGuests, setMaxGuests] = useState("1");
+  const [guestCategory, setGuestCategory] =
+    useState<"Regular" | "VIP">("Regular");
 
   const [guests, setGuests] = useState<Guest[]>([]);
   const [search, setSearch] = useState("");
@@ -92,6 +95,7 @@ export default function GuestGeneratorPage() {
             guestName,
             phone,
             maxGuests: Number(maxGuests),
+            guestCategory,
           }),
         }
       );
@@ -119,6 +123,7 @@ export default function GuestGeneratorPage() {
       setGuestName("");
       setPhone("");
       setMaxGuests("1");
+      setGuestCategory("Regular");
 
       await loadGuests();
     } catch {
@@ -194,6 +199,7 @@ export default function GuestGeneratorPage() {
       "Guest Name",
       "Phone",
       "Guests Allowed",
+      "Category",
       "RSVP Status",
       "Guests Attending",
       "Guest Names",
@@ -216,6 +222,7 @@ export default function GuestGeneratorPage() {
           guest.phone ||
           "",
         guest.max_guests,
+        guest.guest_category,
         status,
         guest.rsvps?.guests_attending ??
           "",
@@ -301,14 +308,19 @@ export default function GuestGeneratorPage() {
     guests.filter(
       (guest) =>
         guest.rsvps !== null &&
-        guest.rsvps.attendance ===
-          false
+        guest.rsvps.attendance === false
     ).length;
 
   const pendingCount =
     guests.filter(
       (guest) =>
         !guest.rsvp_submitted
+    ).length;
+
+  const vipCount =
+    guests.filter(
+      (guest) =>
+        guest.guest_category === "VIP"
     ).length;
 
   const filteredGuests =
@@ -327,14 +339,13 @@ export default function GuestGeneratorPage() {
       const matchesFilter =
         filter === "all" ||
         (filter === "attending" &&
-          guest.rsvps?.attendance ===
-            true) ||
-        (filter ===
-          "not-attending" &&
-          guest.rsvps?.attendance ===
-            false) ||
+          guest.rsvps?.attendance === true) ||
+        (filter === "not-attending" &&
+          guest.rsvps?.attendance === false) ||
         (filter === "pending" &&
-          !guest.rsvp_submitted);
+          !guest.rsvp_submitted) ||
+        (filter === "vip" &&
+          guest.guest_category === "VIP");
 
       return (
         matchesSearch &&
@@ -376,7 +387,7 @@ export default function GuestGeneratorPage() {
 
         {/* STATS */}
 
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
 
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <p className="text-sm text-gray-500">
@@ -418,6 +429,16 @@ export default function GuestGeneratorPage() {
             </p>
           </div>
 
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <p className="text-sm text-gray-500">
+              VIP Guests
+            </p>
+
+            <p className="text-3xl text-[#B68A22] mt-2">
+              {vipCount}
+            </p>
+          </div>
+
         </div>
 
         {/* CREATE INVITATION */}
@@ -434,15 +455,14 @@ export default function GuestGeneratorPage() {
             </h2>
 
             <p className="mt-2 text-gray-500">
-              Generate a unique
-              invitation link for each
-              guest.
+              Generate a unique invitation
+              link for each guest.
             </p>
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="grid md:grid-cols-3 gap-6"
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
 
             <div>
@@ -522,7 +542,37 @@ export default function GuestGeneratorPage() {
               </select>
             </div>
 
-            <div className="md:col-span-3">
+            <div>
+              <label
+                htmlFor="guestCategory"
+                className="block text-sm text-[#800020] mb-2"
+              >
+                Guest Category
+              </label>
+
+              <select
+                id="guestCategory"
+                value={guestCategory}
+                onChange={(e) =>
+                  setGuestCategory(
+                    e.target.value as
+                      | "Regular"
+                      | "VIP"
+                  )
+                }
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
+              >
+                <option value="Regular">
+                  Regular
+                </option>
+
+                <option value="VIP">
+                  VIP
+                </option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2 lg:col-span-4">
               <button
                 type="submit"
                 disabled={loading}
@@ -616,6 +666,10 @@ export default function GuestGeneratorPage() {
             <option value="pending">
               Pending
             </option>
+
+            <option value="vip">
+              VIP Guests
+            </option>
           </select>
 
         </div>
@@ -632,8 +686,7 @@ export default function GuestGeneratorPage() {
               </h2>
 
               <p className="text-sm text-gray-500 mt-1">
-                Your generated
-                invitations
+                Your generated invitations
               </p>
             </div>
 
@@ -669,8 +722,7 @@ export default function GuestGeneratorPage() {
             <div className="p-10 text-center text-gray-500">
               Loading guests...
             </div>
-          ) : filteredGuests.length ===
-            0 ? (
+          ) : filteredGuests.length === 0 ? (
             <div className="p-10 text-center text-gray-500">
               No matching guests found.
             </div>
@@ -720,19 +772,28 @@ export default function GuestGeneratorPage() {
 
                         <td className="px-6 py-5">
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedGuest(
-                                guest
-                              )
-                            }
-                            className="font-medium text-[#800020] hover:underline text-left"
-                          >
-                            {
-                              guest.guest_name
-                            }
-                          </button>
+                          <div className="flex items-center gap-2 flex-wrap">
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedGuest(
+                                  guest
+                                )
+                              }
+                              className="font-medium text-[#800020] hover:underline text-left"
+                            >
+                              {guest.guest_name}
+                            </button>
+
+                            {guest.guest_category ===
+                              "VIP" && (
+                              <span className="rounded-full bg-[#D4AF37]/15 px-2 py-1 text-[10px] font-bold tracking-wider text-[#9A7518]">
+                                VIP
+                              </span>
+                            )}
+
+                          </div>
 
                           <p className="text-xs text-gray-400 mt-1">
                             {new Date(
@@ -748,9 +809,7 @@ export default function GuestGeneratorPage() {
                         </td>
 
                         <td className="px-6 py-5 text-sm text-gray-600">
-                          {
-                            guest.max_guests
-                          }
+                          {guest.max_guests}
                         </td>
 
                         <td className="px-6 py-5">
@@ -886,11 +945,22 @@ export default function GuestGeneratorPage() {
                     Guest
                   </p>
 
-                  <p className="font-medium text-[#800020]">
-                    {
-                      selectedGuest.guest_name
-                    }
-                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+
+                    <p className="font-medium text-[#800020]">
+                      {
+                        selectedGuest.guest_name
+                      }
+                    </p>
+
+                    {selectedGuest.guest_category ===
+                      "VIP" && (
+                      <span className="rounded-full bg-[#D4AF37]/15 px-2 py-1 text-[10px] font-bold tracking-wider text-[#9A7518]">
+                        VIP
+                      </span>
+                    )}
+
+                  </div>
                 </div>
 
                 <div>
@@ -919,6 +989,18 @@ export default function GuestGeneratorPage() {
                           ?.attendance
                       ? `Attending — ${selectedGuest.rsvps.guests_attending} guest(s)`
                       : "Not attending"}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs uppercase text-gray-400">
+                    Guests Allowed
+                  </p>
+
+                  <p className="text-gray-600">
+                    {
+                      selectedGuest.max_guests
+                    }
                   </p>
                 </div>
 

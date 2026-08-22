@@ -9,6 +9,7 @@ type Guest = {
   id: string;
   guest_name: string;
   max_guests: number;
+  guest_category: "Regular" | "VIP";
   invitation_code: string;
   rsvp_submitted: boolean;
 };
@@ -439,44 +440,60 @@ function downloadAccessCard() {
     190
   );
 
-  // Guest name
-  ctx.fillStyle = "#FFFFFF";
+  // =========================
+// GUEST NAME
+// =========================
 
-  ctx.shadowColor =
-    "rgba(255,255,255,0.18)";
-  ctx.shadowBlur = 6;
+ctx.fillStyle = "#FFFFFF";
 
-  ctx.font = "italic 70px Georgia";
+ctx.shadowColor =
+  "rgba(255,255,255,0.18)";
+ctx.shadowBlur = 6;
 
-  ctx.fillText(
-    name,
-    1130,
-    285
-  );
+// VIP names are slightly smaller because
+// "(VIP GUEST)" is added after the guest name.
+ctx.font =
+  guest?.guest_category === "VIP"
+    ? "italic 55px Georgia"
+    : "italic 70px Georgia";
 
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
+const accessCardName =
+  guest?.guest_category === "VIP"
+    ? `${name} (VIP GUEST)`
+    : name;
 
-  // Guests admitted
-  ctx.fillStyle = "#E7C65E";
-  ctx.font = "bold 44px Georgia";
+ctx.fillText(
+  accessCardName,
+  1130,
+  285
+);
 
-  ctx.fillText(
-    String(admitted),
-    975,
-    360
-  );
+ctx.shadowColor = "transparent";
+ctx.shadowBlur = 0;
 
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = "24px Georgia";
+// =========================
+// GUESTS ADMITTED
+// =========================
 
-  ctx.fillText(
-    admitted === 1
-      ? "GUEST ADMITTED"
-      : "GUESTS ADMITTED",
-    1165,
-    360
-  );
+ctx.fillStyle = "#E7C65E";
+ctx.font = "bold 44px Georgia";
+
+ctx.fillText(
+  String(admitted),
+  975,
+  360
+);
+
+ctx.fillStyle = "#FFFFFF";
+ctx.font = "24px Georgia";
+
+ctx.fillText(
+  admitted === 1
+    ? "GUEST ADMITTED"
+    : "GUESTS ADMITTED",
+  1165,
+  360
+);
 
   // =========================
   // EVENT DETAILS

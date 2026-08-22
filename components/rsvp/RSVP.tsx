@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import SectionTitle from "../section-title/SectionTitle";
 
 type RSVPProps = {
@@ -11,8 +12,21 @@ type RSVPProps = {
 export default function RSVP({
   invitationCode,
 }: RSVPProps) {
-  const rsvpLink = invitationCode
-    ? `/rsvp?code=${invitationCode}`
+  const pathname = usePathname();
+
+  // Example pathname:
+  // /invite/6JDM3Q6W
+  const pathCode =
+    pathname.startsWith("/invite/")
+      ? pathname.split("/invite/")[1]?.split("/")[0]
+      : undefined;
+
+  // Use the supplied code first.
+  // If it is missing, get it directly from the URL.
+  const code = invitationCode || pathCode;
+
+  const rsvpLink = code
+    ? `/rsvp?code=${encodeURIComponent(code)}`
     : "/rsvp";
 
   return (
@@ -24,10 +38,20 @@ export default function RSVP({
         />
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          initial={{
+            opacity: 0,
+            y: 30,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.8,
+          }}
         >
           <div className="text-[#D4AF37] text-3xl mb-6">
             ✦

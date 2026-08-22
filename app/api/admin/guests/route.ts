@@ -7,7 +7,8 @@ const supabase = createClient(
 );
 
 function generateInvitationCode(length = 8) {
-  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const characters =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
   let code = "";
 
@@ -19,15 +20,26 @@ function generateInvitationCode(length = 8) {
 
   return code;
 }
-export async function GET(request: Request) {
-  const session = request.headers.get("cookie")?.match(
-    /(?:^|;\s*)admin_session=([^;]+)/
-  )?.[1];
 
-  if (
-    !session ||
-    session !== process.env.ADMIN_SESSION_TOKEN
-  ) {
+function isAuthorized(request: Request) {
+  const session = request.headers
+    .get("cookie")
+    ?.match(
+      /(?:^|;\s*)admin_session=([^;]+)/
+    )?.[1];
+
+  return (
+    session &&
+    session === process.env.ADMIN_SESSION_TOKEN
+  );
+}
+
+// ========================================
+// GET ALL GUESTS
+// ========================================
+
+export async function GET(request: Request) {
+  if (!isAuthorized(request)) {
     return NextResponse.json(
       { error: "Unauthorized." },
       { status: 401 }
@@ -35,86 +47,121 @@ export async function GET(request: Request) {
   }
 
   try {
-   const { data, error } = await supabase
-  .from("guests")
-  .select(`
-    id,
-    guest_name,
-    phone,
-    max_guests,
-    invitation_code,
-    rsvp_submitted,
-    created_at,
-    rsvps (
-      attendance,
-      guests_attending,
-      guest_names,
-      phone,
-      message,
-      submitted_at
-    )
-  `)
-  .order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("guests")
+      .select(`
+        id,
+        guest_name,
+        phone,
+        max_guests,
+        guest_category,
+        invitation_code,
+        rsvp_submitted,
+        created_at,
+        rsvps (
+          attendance,
+          guests_attending,
+          guest_names,
+          phone,
+          message,
+          submitted_at
+        )
+      `)
+      .order("created_at", {
+        ascending: false,
+      });
 
     if (error) {
       console.error(error);
 
       return NextResponse.json(
-        { error: "Unable to load guests." },
+        {
+          error: "Unable to load guests.",
+        },
         { status: 500 }
       );
     }
 
-  
-
-return NextResponse.json({
-  success: true,
-  guests: data,
-});
+    return NextResponse.json({
+      success: true,
+      guests: data,
+    });
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Something went wrong." },
+      {
+        error: "Something went wrong.",
+      },
       { status: 500 }
     );
   }
 }
-export async function POST(request: Request) {const session = request.headers.get("cookie")?.match(
-  /(?:^|;\s*)admin_session=([^;]+)/
-)?.[1];
 
-if (
-  !session ||
-  session !== process.env.ADMIN_SESSION_TOKEN
-) {
-  return NextResponse.json(
-    { error: "Unauthorized." },
-    { status: 401 }
-  );
-}
+// ========================================
+// CREATE GUEST
+// ========================================
+
+export async function POST(request: Request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { error: "Unauthorized." },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = await request.json();
 
-    const guestName = body.guestName?.trim();
-    const phone = body.phone?.trim();
-    const maxGuests = Number(body.maxGuests);
+    const guestName =
+      body.guestName?.trim();
+
+    const phone =
+      body.phone?.trim();
+
+    const maxGuests =
+      Number(body.maxGuests);
+
+    const guestCategory =
+      body.guestCategory === "VIP"
+        ? "VIP"
+        : "Regular";
 
     if (!guestName) {
       return NextResponse.json(
-        { error: "Guest name is required." },
+        {
+          error: "Guest name is required.",
+        },
         { status: 400 }
       );
     }
 
     if (![1, 2, 3].includes(maxGuests)) {
       return NextResponse.json(
-        { error: "Maximum guests must be 1, 2, or 3." },
+        {
+          error:
+            "Maximum guests must be 1, 2, or 3.",
+        },
         { status: 400 }
       );
     }
 
-    let invitationCode = generateInvitationCode();
+    if (
+      !["Regular", "VIP"].includes(
+        guestCategory
+      )
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid guest category.",
+        },
+        { status: 400 }
+      );
+    }
+
+    let invitationCode =
+      generateInvitationCode();
 
     let existingCode = true;
 
@@ -122,13 +169,17 @@ if (
       const { data } = await supabase
         .from("guests")
         .select("id")
-        .eq("invitation_code", invitationCode)
+        .eq(
+          "invitation_code",
+          invitationCode
+        )
         .maybeSingle();
 
       if (!data) {
         existingCode = false;
       } else {
-        invitationCode = generateInvitationCode();
+        invitationCode =
+          generateInvitationCode();
       }
     }
 
@@ -138,6 +189,7 @@ if (
         guest_name: guestName,
         phone: phone || null,
         max_guests: maxGuests,
+        guest_category: guestCategory,
         invitation_code: invitationCode,
       })
       .select()
@@ -147,7 +199,10 @@ if (
       console.error(error);
 
       return NextResponse.json(
-        { error: "Unable to create guest." },
+        {
+          error:
+            "Unable to create guest.",
+        },
         { status: 500 }
       );
     }
@@ -160,20 +215,22 @@ if (
     console.error(error);
 
     return NextResponse.json(
-      { error: "Something went wrong." },
+      {
+        error: "Something went wrong.",
+      },
       { status: 500 }
     );
   }
 }
-export async function DELETE(request: Request) {
-  const session = request.headers
-    .get("cookie")
-    ?.match(/(?:^|;\s*)admin_session=([^;]+)/)?.[1];
 
-  if (
-    !session ||
-    session !== process.env.ADMIN_SESSION_TOKEN
-  ) {
+// ========================================
+// DELETE GUEST
+// ========================================
+
+export async function DELETE(
+  request: Request
+) {
+  if (!isAuthorized(request)) {
     return NextResponse.json(
       { error: "Unauthorized." },
       { status: 401 }
@@ -181,18 +238,26 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const body = await request.json();
-    const guestId = body.guestId;
+    const body =
+      await request.json();
+
+    const guestId =
+      body.guestId;
 
     if (!guestId) {
       return NextResponse.json(
-        { error: "Guest ID is required." },
+        {
+          error:
+            "Guest ID is required.",
+        },
         { status: 400 }
       );
     }
 
     // Delete RSVP first
-    const { error: rsvpError } = await supabase
+    const {
+      error: rsvpError,
+    } = await supabase
       .from("rsvps")
       .delete()
       .eq("guest_id", guestId);
@@ -201,13 +266,18 @@ export async function DELETE(request: Request) {
       console.error(rsvpError);
 
       return NextResponse.json(
-        { error: "Unable to delete RSVP." },
+        {
+          error:
+            "Unable to delete RSVP.",
+        },
         { status: 500 }
       );
     }
 
     // Delete guest
-    const { error: guestError } = await supabase
+    const {
+      error: guestError,
+    } = await supabase
       .from("guests")
       .delete()
       .eq("id", guestId);
@@ -216,7 +286,10 @@ export async function DELETE(request: Request) {
       console.error(guestError);
 
       return NextResponse.json(
-        { error: "Unable to delete guest." },
+        {
+          error:
+            "Unable to delete guest.",
+        },
         { status: 500 }
       );
     }
@@ -228,7 +301,9 @@ export async function DELETE(request: Request) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Something went wrong." },
+      {
+        error: "Something went wrong.",
+      },
       { status: 500 }
     );
   }
