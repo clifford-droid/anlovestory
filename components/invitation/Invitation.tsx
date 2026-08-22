@@ -8,6 +8,7 @@ import RSVP from "@/components/rsvp/RSVP";
 import Location from "@/components/location/Location";
 import Closing from "@/components/closing/Closing";
 import Footer from "@/components/footer/Footer";
+import Gifting from "@/components/gifting/Gifting";
 
 type InvitationProps = {
   invitationCode?: string;
@@ -24,10 +25,11 @@ export default function Invitation({
       <WeddingDetails />
       <Location />
       <TraditionalMarriage />
-      <Gallery />
+     <Gallery />
 
-      <RSVP invitationCode={invitationCode} />
+<Gifting />
 
+<RSVP invitationCode={invitationCode} />
       <Closing />
       <Footer />
     </>
