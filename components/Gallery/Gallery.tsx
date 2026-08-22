@@ -29,6 +29,10 @@ const photos = [
     src: "/images/gallery/photo6.jpeg",
     alt: "Angel and Nnamdi",
   },
+  {
+  src: "/images/gallery/photo7.jpeg",
+  alt: "Angel and Nnamdi",
+},
 ];
 
 export default function Gallery() {
