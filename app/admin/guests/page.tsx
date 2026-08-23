@@ -1,7 +1,9 @@
+
+
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
-
+import { FormEvent, useEffect, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 type RSVP = {
   attendance: boolean;
   guests_attending: number;
@@ -43,6 +45,20 @@ export default function GuestGeneratorPage() {
 
   const [error, setError] = useState("");
   const [link, setLink] = useState("");
+  const [importing, setImporting] = useState(false);
+const [importMessage, setImportMessage] = useState("");
+const [importError, setImportError] = useState("");
+
+const [importedGuests, setImportedGuests] = useState<
+  {
+    guest_name: string;
+    max_guests: number;
+    guest_category: "Regular" | "VIP";
+    invitation_code: string;
+  }[]
+>([]);
+
+const excelInputRef = useRef<HTMLInputElement | null>(null);
 
   async function loadGuests() {
     setLoadingGuests(true);
@@ -277,7 +293,189 @@ export default function GuestGeneratorPage() {
 
     URL.revokeObjectURL(url);
   }
+async function handleExcelImport(
+  event: React.ChangeEvent<HTMLInputElement>
+) {
+  const file = event.target.files?.[0];
 
+  if (!file) {
+    return;
+  }
+
+  setImporting(true);
+  setImportMessage("");
+  setImportError("");
+  setImportedGuests([]);
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+
+    const workbook = XLSX.read(arrayBuffer, {
+      type: "array",
+    });
+
+    const firstSheetName = workbook.SheetNames[0];
+
+    if (!firstSheetName) {
+      throw new Error("The Excel file contains no worksheet.");
+    }
+
+    const worksheet = workbook.Sheets[firstSheetName];
+
+    const rows = XLSX.utils.sheet_to_json<
+      Record<string, unknown>
+    >(worksheet, {
+      defval: "",
+    });
+
+    if (rows.length === 0) {
+      throw new Error("The Excel file contains no guest records.");
+    }
+
+    const guests = rows.map((row, index) => {
+      const guestName = String(
+        row["Guest Name"] ?? ""
+      ).trim();
+
+      
+
+      const maxGuests = Number(
+        row["Max Guests"]
+      );
+
+      const guestCategory = String(
+        row["Category"] ?? "Regular"
+      ).trim();
+
+      if (!guestName) {
+        throw new Error(
+          `Row ${index + 2}: Guest Name is missing.`
+        );
+      }
+
+      if (![1, 2, 3].includes(maxGuests)) {
+        throw new Error(
+          `Row ${index + 2}: Max Guests must be 1, 2, or 3.`
+        );
+      }
+
+      const normalizedCategory =
+        guestCategory.toUpperCase();
+
+      if (
+        normalizedCategory !== "VIP" &&
+        normalizedCategory !== "REGULAR"
+      ) {
+        throw new Error(
+          `Row ${index + 2}: Category must be VIP or Regular.`
+        );
+      }
+
+      return {
+        guestName,
+        maxGuests,
+        guestCategory:
+          normalizedCategory === "VIP"
+            ? "VIP"
+            : "Regular",
+      };
+    });
+
+    const confirmed = window.confirm(
+      `Import ${guests.length} guest${
+        guests.length === 1 ? "" : "s"
+      } from ${file.name}?`
+    );
+
+    if (!confirmed) {
+      setImporting(false);
+
+      if (excelInputRef.current) {
+        excelInputRef.current.value = "";
+      }
+
+      return;
+    }
+
+    const response = await fetch(
+      "/api/admin/guests/bulk",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          guests,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Unable to import guest list."
+      );
+    }
+
+   setImportedGuests(data.guests || []);
+
+setImportMessage(
+  `${data.imported} guest${
+    data.imported === 1 ? "" : "s"
+  } imported successfully. Invitation links are ready to download.`
+);
+
+await loadGuests();
+  } catch (error) {
+    setImportError(
+      error instanceof Error
+        ? error.message
+        : "Something went wrong while importing the Excel file."
+    );
+  } finally {
+    setImporting(false);
+
+    if (excelInputRef.current) {
+      excelInputRef.current.value = "";
+    }
+  }
+}
+function downloadInvitationLinks() {
+  if (importedGuests.length === 0) {
+    return;
+  }
+
+  const rows = importedGuests.map((guest) => ({
+    "Guest Name": guest.guest_name,
+    "Max Guests": guest.max_guests,
+    Category: guest.guest_category,
+    "Invitation Link":
+      `${window.location.origin}/invite/${guest.invitation_code}`,
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+
+  worksheet["!cols"] = [
+    { wch: 35 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 60 },
+  ];
+
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Invitation Links"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    "ANLoveStory-Invitation-Links.xlsx"
+  );
+}
   function logout() {
     document.cookie =
       "admin_session=; Max-Age=0; path=/";
@@ -691,7 +889,24 @@ export default function GuestGeneratorPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
+<input
+  ref={excelInputRef}
+  type="file"
+  accept=".xlsx,.xls"
+  onChange={handleExcelImport}
+  className="hidden"
+/>
 
+<button
+  type="button"
+  onClick={() => excelInputRef.current?.click()}
+  disabled={importing}
+  className="rounded-full bg-[#D4AF37] text-[#800020] px-5 py-2 hover:opacity-90 transition disabled:opacity-50"
+>
+  {importing
+    ? "IMPORTING..."
+    : "UPLOAD EXCEL GUEST LIST"}
+</button>
               <button
                 type="button"
                 onClick={exportGuestList}
@@ -717,7 +932,31 @@ export default function GuestGeneratorPage() {
             </div>
 
           </div>
+{importMessage && (
+  <div className="mt-4 rounded-2xl border border-green-200 bg-green-50 p-5">
+    <p className="text-sm text-green-700">
+      {importMessage}
+    </p>
 
+    {importedGuests.length > 0 && (
+      <button
+        type="button"
+        onClick={downloadInvitationLinks}
+        className="mt-4 rounded-full bg-[#800020] px-6 py-3 text-sm text-white hover:bg-[#650019] transition"
+      >
+        DOWNLOAD INVITATION LINKS
+      </button>
+    )}
+  </div>
+)}
+
+{importError && (
+  <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-5">
+    <p className="text-sm text-red-600">
+      {importError}
+    </p>
+  </div>
+)}
           {loadingGuests ? (
             <div className="p-10 text-center text-gray-500">
               Loading guests...
