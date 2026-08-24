@@ -359,17 +359,17 @@ async function handleExcelImport(
         );
       }
 
-      const normalizedCategory =
-        guestCategory.toUpperCase();
+     const normalizedCategory =
+  guestCategory.toUpperCase();
 
-      if (
-        normalizedCategory !== "VIP" &&
-        normalizedCategory !== "REGULAR"
-      ) {
-        throw new Error(
-          `Row ${index + 2}: Category must be VIP or Regular.`
-        );
-      }
+if (
+  normalizedCategory !== "" &&
+  normalizedCategory !== "VIP"
+) {
+  throw new Error(
+    `Row ${index + 2}: Category should be VIP or left blank.`
+  );
+}
 
       return {
         guestName,
