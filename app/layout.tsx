@@ -32,6 +32,10 @@ export const metadata: Metadata = {
     description:
       "Nnamdi John & Angel Nwanyim Wedding Invitation",
 
+  siteName: "ANLoveStory",
+
+  url: "https://anlovestory.vercel.app/",
+
     type: "website",
 
     images: [
