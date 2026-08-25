@@ -1,4 +1,3 @@
-
 "use client";
 
 import { motion } from "framer-motion";
@@ -37,7 +36,7 @@ export default function TraditionalMarriage() {
           <div className="mt-10 grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl bg-[#FAF8F5] p-7 shadow-sm">
               <h4 className="text-xl text-[#800020]">
-                Bride's Family
+                Bride&apos;s Family
               </h4>
 
               <p className="mt-4 text-gray-600 leading-7">
@@ -47,7 +46,7 @@ export default function TraditionalMarriage() {
 
             <div className="rounded-2xl bg-[#FAF8F5] p-7 shadow-sm">
               <h4 className="text-xl text-[#800020]">
-                Groom's Family
+                Groom&apos;s Family
               </h4>
 
               <p className="mt-4 text-gray-600 leading-7">
@@ -55,6 +54,32 @@ export default function TraditionalMarriage() {
               </p>
             </div>
           </div>
+
+          {/* Traditional Marriage Venue */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="mt-8 rounded-2xl bg-[#FAF8F5] p-8 shadow-sm"
+          >
+            <div className="text-[#D4AF37] text-3xl mb-4">
+              ⌖
+            </div>
+
+            <h4 className="text-xl text-[#800020]">
+              Venue
+            </h4>
+
+            <p className="mt-4 text-gray-600 leading-7">
+              Mr &amp; Mrs Chukwuemeka Nwanyim&apos;s Compound
+            </p>
+
+            <p className="mt-2 text-sm text-gray-500 leading-6">
+              Obodoeze Imama, Nomeh, Nkanu East LGA,
+              Enugu State
+            </p>
+          </motion.div>
 
           <div className="mt-10 text-[#D4AF37] text-2xl">
             ✦ ♥ ✦
@@ -64,4 +89,3 @@ export default function TraditionalMarriage() {
     </section>
   );
 }
-
