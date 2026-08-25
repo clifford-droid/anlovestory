@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Poppins } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Poppins,
+} from "next/font/google";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -15,7 +18,31 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "ANLoveStory",
-  description: "Nnamdi John & Angel Nwanyim Wedding Invitation",
+  description:
+    "Nnamdi John & Angel Nwanyim Wedding Invitation",
+
+  openGraph: {
+    title: "ANLoveStory",
+    description:
+      "Nnamdi John & Angel Nwanyim Wedding Invitation",
+    type: "website",
+    images: [
+      {
+        url: "/images/wedding-preview.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Nnamdi John & Angel Nwanyim Wedding Invitation",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "ANLoveStory",
+    description:
+      "Nnamdi John & Angel Nwanyim Wedding Invitation",
+    images: ["/images/wedding-preview.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -25,7 +52,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${cormorant.variable} ${poppins.variable}`}>
+      <body
+        className={`${cormorant.variable} ${poppins.variable}`}
+      >
         {children}
       </body>
     </html>
