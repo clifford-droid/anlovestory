@@ -18,23 +18,23 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    "https://YOUR-VERCEL-DOMAIN.vercel.app"
+    "https://anlovestory.vercel.app"
   ),
 
   title: "ANLoveStory",
 
   description:
-    "Nnamdi John & Angel Nwanyim Wedding Invitation",
+    "Angel Nwanyim & Nnamdi John Wedding Invitation",
 
   openGraph: {
     title: "ANLoveStory",
 
     description:
-      "Nnamdi John & Angel Nwanyim Wedding Invitation",
+      "Angel Nwanyim & Nnamdi John Wedding Invitation",
 
-  siteName: "ANLoveStory",
+    siteName: "ANLoveStory",
 
-  url: "https://anlovestory.vercel.app/",
+    url: "https://anlovestory.vercel.app",
 
     type: "website",
 
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: "ANLoveStory",
 
     description:
-      "Nnamdi John & Angel Nwanyim Wedding Invitation",
+      "Angel Nwanyim & Nnamdi John Wedding Invitation",
 
     images: [
       "/images/wedding-preview.jpg",
