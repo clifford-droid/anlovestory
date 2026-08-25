@@ -17,31 +17,44 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    "https://YOUR-VERCEL-DOMAIN.vercel.app"
+  ),
+
   title: "ANLoveStory",
+
   description:
     "Nnamdi John & Angel Nwanyim Wedding Invitation",
 
   openGraph: {
     title: "ANLoveStory",
+
     description:
       "Nnamdi John & Angel Nwanyim Wedding Invitation",
+
     type: "website",
+
     images: [
       {
         url: "/images/wedding-preview.jpg",
         width: 1200,
         height: 630,
-        alt: "Nnamdi John & Angel Nwanyim Wedding Invitation",
+        alt: "Angel & Nnamdi Wedding Invitation",
       },
     ],
   },
 
   twitter: {
     card: "summary_large_image",
+
     title: "ANLoveStory",
+
     description:
       "Nnamdi John & Angel Nwanyim Wedding Invitation",
-    images: ["/images/wedding-preview.jpg"],
+
+    images: [
+      "/images/wedding-preview.jpg",
+    ],
   },
 };
 
