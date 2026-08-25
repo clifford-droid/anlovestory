@@ -308,20 +308,26 @@ async function handleExcelImport(
   setImportedGuests([]);
 
   try {
+    // Read the uploaded Excel file
     const arrayBuffer = await file.arrayBuffer();
 
     const workbook = XLSX.read(arrayBuffer, {
       type: "array",
     });
 
+    // Use the first worksheet
     const firstSheetName = workbook.SheetNames[0];
 
     if (!firstSheetName) {
-      throw new Error("The Excel file contains no worksheet.");
+      throw new Error(
+        "The Excel file contains no worksheet."
+      );
     }
 
-    const worksheet = workbook.Sheets[firstSheetName];
+    const worksheet =
+      workbook.Sheets[firstSheetName];
 
+    // Convert worksheet rows to JavaScript objects
     const rows = XLSX.utils.sheet_to_json<
       Record<string, unknown>
     >(worksheet, {
@@ -329,47 +335,112 @@ async function handleExcelImport(
     });
 
     if (rows.length === 0) {
-      throw new Error("The Excel file contains no guest records.");
+      throw new Error(
+        "The Excel file contains no guest records."
+      );
     }
 
+    // Convert each Excel row into the format
+    // required by our bulk guest API
     const guests = rows.map((row, index) => {
+      // Normalize Excel column headings.
+      // This prevents invisible spaces or capitalization
+      // from breaking the import.
+      const normalizedRow =
+        Object.fromEntries(
+          Object.entries(row).map(
+            ([key, value]) => [
+              key
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, " "),
+              value,
+            ]
+          )
+        );
+
+      // =========================
+      // GUEST NAME
+      // =========================
+
       const guestName = String(
-        row["Guest Name"] ?? ""
-      ).trim();
-
-      
-
-      const maxGuests = Number(
-        row["Max Guests"]
-      );
-
-      const guestCategory = String(
-        row["Category"] ?? "Regular"
+        normalizedRow["guest name"] ??
+          normalizedRow["guest"] ??
+          normalizedRow["name"] ??
+          ""
       ).trim();
 
       if (!guestName) {
         throw new Error(
-          `Row ${index + 2}: Guest Name is missing.`
+          `Row ${
+            index + 2
+          }: Guest Name is missing.`
         );
       }
+
+      // =========================
+      // MAX GUESTS
+      // =========================
+
+      const rawMaxGuests =
+        normalizedRow["max guests"] ??
+        normalizedRow["max guest"] ??
+        normalizedRow["guests allowed"] ??
+        normalizedRow["guest allowed"] ??
+        normalizedRow["number of guests"] ??
+        "";
+
+      // This handles values such as:
+      // 1
+      // 2
+      // 3
+      // "2 Guests"
+      // "3 guests"
+      const cleanedMaxGuests = String(
+        rawMaxGuests
+      )
+        .trim()
+        .replace(/[^0-9]/g, "");
+
+      const maxGuests = Number(
+        cleanedMaxGuests
+      );
 
       if (![1, 2, 3].includes(maxGuests)) {
         throw new Error(
-          `Row ${index + 2}: Max Guests must be 1, 2, or 3.`
+          `Row ${
+            index + 2
+          }: Max Guests must be 1, 2, or 3. The value found was "${String(
+            rawMaxGuests
+          )}".`
         );
       }
 
-     const normalizedCategory =
-  guestCategory.toUpperCase();
+      // =========================
+      // CATEGORY
+      // =========================
 
-if (
-  normalizedCategory !== "" &&
-  normalizedCategory !== "VIP"
-) {
-  throw new Error(
-    `Row ${index + 2}: Category should be VIP or left blank.`
-  );
-}
+      const guestCategory = String(
+        normalizedRow["category"] ??
+          normalizedRow["guest category"] ??
+          ""
+      ).trim();
+
+      const normalizedCategory =
+        guestCategory.toUpperCase();
+
+      // VIP is entered explicitly.
+      // Blank means Regular.
+      if (
+        normalizedCategory !== "" &&
+        normalizedCategory !== "VIP"
+      ) {
+        throw new Error(
+          `Row ${
+            index + 2
+          }: Category should be VIP or left blank.`
+        );
+      }
 
       return {
         guestName,
@@ -381,6 +452,10 @@ if (
       };
     });
 
+    // =========================
+    // CONFIRM IMPORT
+    // =========================
+
     const confirmed = window.confirm(
       `Import ${guests.length} guest${
         guests.length === 1 ? "" : "s"
@@ -388,21 +463,20 @@ if (
     );
 
     if (!confirmed) {
-      setImporting(false);
-
-      if (excelInputRef.current) {
-        excelInputRef.current.value = "";
-      }
-
       return;
     }
+
+    // =========================
+    // SEND TO BULK API
+    // =========================
 
     const response = await fetch(
       "/api/admin/guests/bulk",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
         body: JSON.stringify({
           guests,
@@ -414,19 +488,25 @@ if (
 
     if (!response.ok) {
       throw new Error(
-        data.error || "Unable to import guest list."
+        data.error ||
+          "Unable to import guest list."
       );
     }
 
-   setImportedGuests(data.guests || []);
+    // Keep newly imported guests so we can
+    // generate the downloadable invitation-links Excel file.
+    setImportedGuests(
+      data.guests || []
+    );
 
-setImportMessage(
-  `${data.imported} guest${
-    data.imported === 1 ? "" : "s"
-  } imported successfully. Invitation links are ready to download.`
-);
+    setImportMessage(
+      `${data.imported} guest${
+        data.imported === 1 ? "" : "s"
+      } imported successfully. Invitation links are ready to download.`
+    );
 
-await loadGuests();
+    // Refresh admin guest list
+    await loadGuests();
   } catch (error) {
     setImportError(
       error instanceof Error
@@ -436,6 +516,8 @@ await loadGuests();
   } finally {
     setImporting(false);
 
+    // Clear file input so the same Excel file
+    // can be selected again if necessary.
     if (excelInputRef.current) {
       excelInputRef.current.value = "";
     }
