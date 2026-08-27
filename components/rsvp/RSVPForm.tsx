@@ -1046,25 +1046,6 @@ downloadLink.click();
 document.body.removeChild(
   downloadLink
 );
-
-// Mobile fallback:
-// If the device/browser does not handle
-// the normal download properly,
-// open the access card as an image
-// so the guest can save it manually.
-setTimeout(() => {
-  const isMobile =
-    /Android|iPhone|iPad|iPod/i.test(
-      navigator.userAgent
-    );
-
-  if (isMobile) {
-    window.open(
-      imageUrl,
-      "_blank"
-    );
-  }
-}, 500);
   }
 
   // ========================================
