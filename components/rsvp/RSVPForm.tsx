@@ -60,6 +60,12 @@ export default function RSVPForm({
   const [success, setSuccess] =
     useState(false);
 
+  const [downloaded, setDownloaded] =
+    useState(false);
+
+  const [cardPreview, setCardPreview] =
+    useState<string | null>(null);
+
   // ========================================
   // LOAD INVITATION
   // ========================================
@@ -93,7 +99,6 @@ export default function RSVPForm({
         );
 
         setLoading(false);
-
         return;
       }
 
@@ -106,7 +111,6 @@ export default function RSVPForm({
         );
 
         setLoading(false);
-
         return;
       }
 
@@ -116,9 +120,7 @@ export default function RSVPForm({
         invitation.guest_name
       );
 
-      // If this guest has already submitted
-      // an RSVP, restore their previous RSVP
-      // instead of blocking the invitation.
+      // Returning guest who already RSVP'd
       if (
         invitation.rsvp_submitted
       ) {
@@ -129,12 +131,12 @@ export default function RSVPForm({
         );
 
         if (
-          invitation.guests_attending
+          invitation.guests_attending !==
+          null
         ) {
           setGuests(
             String(
-              invitation
-                .guests_attending
+              invitation.guests_attending
             )
           );
         }
@@ -187,7 +189,6 @@ export default function RSVPForm({
       );
 
       setSubmitting(false);
-
       return;
     }
 
@@ -197,7 +198,6 @@ export default function RSVPForm({
       );
 
       setSubmitting(false);
-
       return;
     }
 
@@ -216,7 +216,6 @@ export default function RSVPForm({
       );
 
       setSubmitting(false);
-
       return;
     }
 
@@ -285,7 +284,6 @@ export default function RSVPForm({
       }
 
       setSubmitting(false);
-
       return;
     }
 
@@ -294,7 +292,7 @@ export default function RSVPForm({
   }
 
   // ========================================
-  // DOWNLOAD ACCESS CARD
+  // ACCESS CARD
   // ========================================
 
   function downloadAccessCard() {
@@ -626,7 +624,7 @@ export default function RSVPForm({
 
     ctx.shadowBlur = 0;
 
-    // Couple Names
+    // Couple names
 
     ctx.fillStyle =
       "#FFFFFF";
@@ -1014,38 +1012,67 @@ export default function RSVPForm({
     );
 
     // ========================================
-    // DOWNLOAD
+    // DOWNLOAD / IPHONE PREVIEW
     // ========================================
 
-  const imageUrl =
-  canvas.toDataURL(
-    "image/png",
-    1
-  );
+    const imageUrl =
+      canvas.toDataURL(
+        "image/png",
+        1
+      );
 
-const downloadLink =
-  document.createElement(
-    "a"
-  );
+    const isIOS =
+      /iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+      ) ||
+      (
+        navigator.platform ===
+          "MacIntel" &&
+        navigator.maxTouchPoints >
+          1
+      );
 
-downloadLink.href =
-  imageUrl;
+    // iPhone / iPad:
+    // Show the generated card on the page.
+    if (isIOS) {
+      setCardPreview(
+        imageUrl
+      );
 
-downloadLink.download =
-  `ANLoveStory-Access-Card-${invitationCode}.png`;
+      return;
+    }
 
-downloadLink.style.display =
-  "none";
+    // Android / desktop:
+    // Download normally.
+    const downloadLink =
+      document.createElement(
+        "a"
+      );
 
-document.body.appendChild(
-  downloadLink
-);
+    downloadLink.href =
+      imageUrl;
 
-downloadLink.click();
+    downloadLink.download =
+      `ANLoveStory-Access-Card-${invitationCode}.png`;
 
-document.body.removeChild(
-  downloadLink
-);
+    downloadLink.style.display =
+      "none";
+
+    document.body.appendChild(
+      downloadLink
+    );
+
+    downloadLink.click();
+
+    document.body.removeChild(
+      downloadLink
+    );
+
+    setDownloaded(true);
+
+    setTimeout(() => {
+      setDownloaded(false);
+    }, 4000);
   }
 
   // ========================================
@@ -1097,7 +1124,7 @@ document.body.removeChild(
             opacity: 1,
             y: 0,
           }}
-          className="max-w-2xl w-full bg-white rounded-3xl p-10 md:p-14 shadow-lg text-center"
+          className="max-w-2xl w-full bg-white rounded-3xl p-8 md:p-14 shadow-lg text-center"
         >
           <div className="text-[#D4AF37] text-3xl mb-5">
             ✦
@@ -1130,6 +1157,44 @@ document.body.removeChild(
                 DOWNLOAD ACCESS CARD
               </button>
 
+              {downloaded && (
+                <p className="mt-4 text-sm text-green-600 font-medium">
+                  ✓ Access card download started
+                </p>
+              )}
+
+              {cardPreview && (
+                <div className="mt-8">
+                  <p className="mb-4 text-[#800020] font-medium">
+                    Your Access Card
+                  </p>
+
+                  <img
+                    src={cardPreview}
+                    alt="Wedding Access Card"
+                    className="w-full rounded-xl shadow-lg"
+                  />
+
+                  <p className="mt-4 text-sm text-gray-500 leading-6">
+                    Press and hold the card above,
+                    then choose the option to save
+                    the image to Photos.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCardPreview(
+                        null
+                      )
+                    }
+                    className="mt-4 text-sm text-[#800020] underline"
+                  >
+                    Close Card
+                  </button>
+                </div>
+              )}
+
               <p className="mt-4 text-xs text-gray-400">
                 One access card is issued per invitation.
               </p>
@@ -1155,7 +1220,6 @@ document.body.removeChild(
   return (
     <main className="min-h-screen bg-[#FAF8F5] py-16 px-6">
       <div className="max-w-3xl mx-auto">
-
         <SectionTitle
           title="Your RSVP"
           subtitle="We are excited to celebrate this special day with you."
@@ -1192,9 +1256,6 @@ document.body.removeChild(
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-
-            {/* NAME */}
-
             <div>
               <label
                 htmlFor="name"
@@ -1218,8 +1279,6 @@ document.body.removeChild(
               />
             </div>
 
-            {/* PHONE */}
-
             <div>
               <label
                 htmlFor="phone"
@@ -1242,8 +1301,6 @@ document.body.removeChild(
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
               />
             </div>
-
-            {/* GUEST NUMBER */}
 
             <div>
               <label
@@ -1302,8 +1359,6 @@ document.body.removeChild(
               </select>
             </div>
 
-            {/* ATTENDANCE */}
-
             <div>
               <label
                 htmlFor="attendance"
@@ -1339,10 +1394,7 @@ document.body.removeChild(
                 </option>
               </select>
             </div>
-
           </div>
-
-          {/* MESSAGE */}
 
           <div className="mt-6">
             <label
@@ -1373,7 +1425,6 @@ document.body.removeChild(
           )}
 
           <div className="mt-8 text-center">
-
             <button
               type="submit"
               disabled={submitting}
@@ -1383,15 +1434,12 @@ document.body.removeChild(
                 ? "SUBMITTING..."
                 : "SUBMIT RSVP"}
             </button>
-
           </div>
-
         </motion.form>
 
         <p className="mt-8 text-center text-[#D4AF37] tracking-widest">
           #ANLoveStory
         </p>
-
       </div>
     </main>
   );
