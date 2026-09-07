@@ -38,6 +38,26 @@ export default function GuestGeneratorPage() {
 
   const [selectedGuest, setSelectedGuest] =
     useState<Guest | null>(null);
+    const [editingGuest, setEditingGuest] =
+  useState<Guest | null>(null);
+
+const [editGuestName, setEditGuestName] =
+  useState("");
+
+const [editPhone, setEditPhone] =
+  useState("");
+
+const [editMaxGuests, setEditMaxGuests] =
+  useState("1");
+
+const [editGuestCategory, setEditGuestCategory] =
+  useState<"Regular" | "VIP">("Regular");
+
+const [editGuestsAttending, setEditGuestsAttending] =
+  useState("1");
+
+const [savingEdit, setSavingEdit] =
+  useState(false);
 
   const [loading, setLoading] = useState(false);
   const [loadingGuests, setLoadingGuests] =
@@ -558,6 +578,92 @@ function downloadInvitationLinks() {
     "ANLoveStory-Invitation-Links.xlsx"
   );
 }
+function openEditGuest(guest: Guest) {
+  setEditingGuest(guest);
+  setEditGuestName(guest.guest_name);
+  setEditPhone(guest.phone || "");
+  setEditMaxGuests(String(guest.max_guests));
+  setEditGuestCategory(guest.guest_category);
+
+  setEditGuestsAttending(
+    guest.rsvps?.guests_attending
+      ? String(guest.rsvps.guests_attending)
+      : "1"
+  );
+}
+
+async function saveGuestEdit(
+  event: FormEvent<HTMLFormElement>
+) {
+  event.preventDefault();
+
+  if (!editingGuest) {
+    return;
+  }
+
+  setSavingEdit(true);
+
+  try {
+    console.log("EDIT VALUES:", {
+  maxGuests: Number(editMaxGuests),
+  guestsAttending:
+    editingGuest?.rsvp_submitted &&
+    editingGuest?.rsvps?.attendance === true
+      ? Number(editGuestsAttending)
+      : null,
+  editMaxGuests,
+  editGuestsAttending,
+});
+const safeMaxGuests = Number(editMaxGuests);
+
+const safeGuestsAttending =
+  editingGuest.rsvp_submitted &&
+  editingGuest.rsvps?.attendance === true
+    ? Math.min(
+        Number(editGuestsAttending),
+        safeMaxGuests
+      )
+    : null;
+    const response = await fetch(
+      "/api/admin/guests",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+       body: JSON.stringify({
+  guestId: editingGuest.id,
+  guestName: editGuestName,
+  phone: editPhone,
+  maxGuests: safeMaxGuests,
+  guestCategory: editGuestCategory,
+  guestsAttending: safeGuestsAttending,
+}),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(
+        data.error ||
+          "Unable to update guest."
+      );
+      return;
+    }
+
+    setEditingGuest(null);
+    await loadGuests();
+
+    alert("Guest updated successfully.");
+  } catch {
+    alert(
+      "Something went wrong while updating the guest."
+    );
+  } finally {
+    setSavingEdit(false);
+  }
+}
   function logout() {
     document.cookie =
       "admin_session=; Max-Age=0; path=/";
@@ -664,6 +770,7 @@ function downloadInvitationLinks() {
             LOGOUT
           </button>
         </div>
+        
 
         {/* STATS */}
 
@@ -1195,6 +1302,13 @@ function downloadInvitationLinks() {
                             >
                               VIEW
                             </a>
+                            <button
+  type="button"
+  onClick={() => openEditGuest(guest)}
+  className="rounded-full border border-blue-300 text-blue-700 px-4 py-2 text-xs hover:bg-blue-50 transition"
+>
+  EDIT
+</button>
 
                             <button
                               type="button"
@@ -1225,14 +1339,221 @@ function downloadInvitationLinks() {
           )}
 
         </div>
+      {/* EDIT GUEST POPUP */}
+
+{editingGuest && (
+  <div className="fixed inset-0 z-50 bg-black/40 p-4">
+
+    <div className="mx-auto flex h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+
+      <div className="shrink-0 border-b border-gray-100 p-6 md:p-8 pb-4">
+
+        <div className="flex items-start justify-between gap-4">
+
+          <div>
+            <p className="text-xl text-[#D4AF37]">
+              ✦
+            </p>
+
+            <h2 className="mt-2 text-2xl text-[#800020]">
+              Edit Guest
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              The existing invitation link will remain unchanged.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setEditingGuest(null)}
+            className="text-2xl text-gray-400 hover:text-[#800020]"
+          >
+            ×
+          </button>
+
+        </div>
+
+      </div>
+
+      <form
+        onSubmit={saveGuestEdit}
+        className="flex-1 overflow-y-auto p-6 md:p-8 pt-4 space-y-5"
+      >
+
+        <div>
+          <label className="block text-sm text-[#800020] mb-2">
+            Guest Name
+          </label>
+
+          <input
+            type="text"
+            value={editGuestName}
+            onChange={(e) =>
+              setEditGuestName(
+                e.target.value
+              )
+            }
+            required
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm text-[#800020] mb-2">
+            Phone Number
+          </label>
+
+          <input
+            type="tel"
+            value={editPhone}
+            onChange={(e) =>
+              setEditPhone(
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
+          />
+        </div>
+
+      <div>
+  <label className="mb-2 block text-sm font-medium text-gray-700">
+    Guests Allowed
+  </label>
+
+  <select
+    value={editMaxGuests}
+    onChange={(e) => {
+      const newMax = Number(e.target.value);
+
+      setEditMaxGuests(String(newMax));
+
+      setEditGuestsAttending((current) => {
+        const currentNumber = Number(current);
+
+        if (currentNumber > newMax) {
+          return String(newMax);
+        }
+
+        return current;
+      });
+    }}
+    className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
+  >
+    <option value="1">1 Guest</option>
+    <option value="2">2 Guests</option>
+    <option value="3">3 Guests</option>
+  </select>
+</div>
+
+        {editingGuest.rsvp_submitted &&
+          editingGuest.rsvps?.attendance === true && (
+            <div>
+              <label className="block text-sm text-[#800020] mb-2">
+                Guests Admitted on Access Card
+              </label>
+
+             <select
+  value={editGuestsAttending}
+  onChange={(e) =>
+    setEditGuestsAttending(e.target.value)
+  }
+  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
+>
+  {Array.from(
+    { length: Number(editMaxGuests) },
+    (_, index) => index + 1
+  ).map((count) => (
+    <option
+      key={count}
+      value={String(count)}
+    >
+      {count} Guest{count > 1 ? "s" : ""}
+    </option>
+  ))}
+</select>
+
+              <p className="mt-2 text-xs text-gray-500">
+                This controls the number printed on the guest&apos;s next access card download.
+              </p>
+            </div>
+          )}
+
+        <div>
+          <label className="block text-sm text-[#800020] mb-2">
+            Guest Category
+          </label>
+
+          <select
+            value={editGuestCategory}
+            onChange={(e) =>
+              setEditGuestCategory(
+                e.target.value as
+                  | "Regular"
+                  | "VIP"
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-[#D4AF37]"
+          >
+            <option value="Regular">
+              Regular
+            </option>
+
+            <option value="VIP">
+              VIP
+            </option>
+          </select>
+        </div>
+
+        <div className="rounded-xl bg-[#FAF8F5] p-4">
+          <p className="text-xs uppercase tracking-wider text-gray-400">
+            Existing Invitation Code
+          </p>
+
+          <p className="mt-1 font-medium text-[#800020]">
+            {
+              editingGuest.invitation_code
+            }
+          </p>
+
+          <p className="mt-1 text-xs text-gray-500">
+            This invitation code will not change.
+          </p>
+        </div>
+
+        <div className="flex gap-3 pt-2">
+
+          <button
+            type="button"
+            onClick={() =>
+              setEditingGuest(null)
+            }
+            className="flex-1 rounded-full border border-gray-300 py-3 text-gray-600 hover:bg-gray-50 transition"
+          >
+            CANCEL
+          </button>
+
+          <button
+            type="submit"
+            disabled={savingEdit}
+            className="flex-1 rounded-full bg-[#800020] py-3 text-white hover:bg-[#650019] transition disabled:opacity-50"
+          >
+            {savingEdit
+              ? "SAVING..."
+              : "SAVE CHANGES"}
+          </button>
+
+        </div>
+      </form>
+    </div>
+  </div>
+)}
 
         {/* RSVP DETAILS POPUP */}
 
         {selectedGuest && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
-
-            <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl">
-
+         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl bg-white p-6 md:p-8 shadow-2xl">
               <div className="flex items-start justify-between gap-4">
 
                 <div>
