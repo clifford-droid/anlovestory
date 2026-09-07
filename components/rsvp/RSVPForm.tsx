@@ -65,6 +65,17 @@ export default function RSVPForm({
 
   const [cardPreview, setCardPreview] =
     useState<string | null>(null);
+    const [rsvpClosed, setRsvpClosed] =
+  useState(false);
+  useEffect(() => {
+  const deadline = new Date(
+    "2026-09-19T00:00:00+01:00"
+  );
+
+  setRsvpClosed(
+    new Date() >= deadline
+  );
+}, []);
 
   // ========================================
   // LOAD INVITATION
@@ -1213,6 +1224,53 @@ export default function RSVPForm({
     );
   }
 
+    // ========================================
+  // RSVP CLOSED
+  // ========================================
+
+  if (rsvpClosed) {
+    return (
+      <main className="min-h-screen bg-[#FAF8F5] py-16 px-6 flex items-center justify-center">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 30,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          className="max-w-2xl w-full bg-white rounded-3xl p-8 md:p-14 shadow-lg text-center"
+        >
+          <div className="text-[#D4AF37] text-3xl mb-5">
+            ✦
+          </div>
+
+          <h1 className="text-3xl md:text-5xl text-[#800020]">
+            RSVP Closed
+          </h1>
+
+          <p className="mt-5 text-gray-500 leading-relaxed">
+            Thank you for your interest in celebrating
+            with us.
+          </p>
+
+          <p className="mt-4 text-gray-600 leading-relaxed">
+            The RSVP deadline was September 18, 2026,
+            and responses are now closed.
+          </p>
+
+          <p className="mt-8 text-[#D4AF37] tracking-widest">
+            #ANLoveStory
+          </p>
+
+          <p className="mt-4 text-[#800020]">
+            Angel & Nnamdi
+          </p>
+        </motion.div>
+      </main>
+    );
+  }
   // ========================================
   // RSVP FORM
   // ========================================
