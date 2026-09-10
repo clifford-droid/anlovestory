@@ -325,11 +325,11 @@ export async function PATCH(request: Request) {
 
       currentRsvp = rsvpData;
     }
-
-    if (
-      currentGuest.rsvp_submitted &&
-      currentRsvp?.attendance === true
-    ) {
+if (
+  currentGuest.rsvp_submitted &&
+  currentRsvp?.attendance === true &&
+  guestsAttendingNumber !== null
+) {
       if (
         guestsAttendingNumber === null ||
         !Number.isInteger(
