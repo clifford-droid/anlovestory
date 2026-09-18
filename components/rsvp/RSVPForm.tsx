@@ -68,9 +68,10 @@ export default function RSVPForm({
     const [rsvpClosed, setRsvpClosed] =
   useState(false);
   useEffect(() => {
-  const deadline = new Date(
-    "2026-09-19T00:00:00+01:00"
-  );
+const deadline = new Date(
+  "2026-09-21T00:00:00+01:00"
+);
+  
 
   setRsvpClosed(
     new Date() >= deadline
@@ -1256,8 +1257,8 @@ export default function RSVPForm({
           </p>
 
           <p className="mt-4 text-gray-600 leading-relaxed">
-            The RSVP deadline was September 18, 2026,
-            and responses are now closed.
+           The RSVP deadline was September 20, 2026,
+and responses are now closed.
           </p>
 
           <p className="mt-8 text-[#D4AF37] tracking-widest">
