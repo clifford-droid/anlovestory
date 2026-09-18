@@ -100,7 +100,7 @@ export default function RSVP({
           )}
 
           <p className="mt-8 text-sm uppercase tracking-widest text-[#800020]">
-            Please respond by September 18, 2026
+            Please respond before September 20, 2026
           </p>
 
           <p className="mt-6 text-[#D4AF37] tracking-widest">
