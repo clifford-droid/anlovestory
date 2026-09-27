@@ -69,7 +69,7 @@ export default function RSVPForm({
   useState(false);
   useEffect(() => {
 const deadline = new Date(
-  "2026-09-21T00:00:00+01:00"
+  "2026-09-30T00:00:00+01:00"
 );
   
 
@@ -1257,7 +1257,7 @@ const deadline = new Date(
           </p>
 
           <p className="mt-4 text-gray-600 leading-relaxed">
-           The RSVP deadline was September 20, 2026,
+           The RSVP deadline was September 29, 2026,
 and responses are now closed.
           </p>
 
