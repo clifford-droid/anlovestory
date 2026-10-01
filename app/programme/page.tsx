@@ -1,33 +1,24 @@
 const programme = [
-  { time: "2:00 PM", event: "Guest Arrival & Reception", icon: "✦" },
-  { time: "3:00 PM", event: "Bridal Train Grand Entrance", icon: "✦" },
-  { time: "3:15 PM", event: "Grand Entrance of the Couple", icon: "♥" },
+  { event: "Arrival & Welcoming of Guests", icon: "✦" },
+  { event: "Recognition of VIP Guests", icon: "✦" },
+  { event: "Let’s Welcome the Chairman", icon: "✦" },
+  { event: "Introduction of the Couple’s Parents", icon: "♥" },
+  { event: "Opening Prayer", icon: "✦" },
+  { event: "Bridal Train Entrance", icon: "✦" },
+  { event: "Couple’s Grand Entrance", icon: "♥" },
+  { event: "Chairman’s Opening Speech", icon: "✦" },
   {
-    time: "3:25 PM",
-    event: "Opening Prayer & Chairman’s Welcome Address",
-    icon: "✦",
+    event: "Couple’s First Dance",
+    subtitle: "Romantic Couple Moment",
+    icon: "♥",
   },
-  { time: "3:40 PM", event: "Couple’s First Dance", icon: "♥" },
-  {
-    time: "3:50 PM",
-    event: "Cake Cutting, Toast & Couple Games",
-    icon: "✦",
-  },
-  { time: "4:10 PM", event: "Food & Drinks Service", icon: "✦" },
-  { time: "4:50 PM", event: "Bridal Party Games", icon: "✦" },
-  {
-    time: "5:15 PM",
-    event: "Entertainment & Photo Moments",
-    icon: "✦",
-  },
-  { time: "5:35 PM", event: "Couple’s Re-entrance", icon: "♥" },
-  {
-    time: "5:45 PM",
-    event: "Parents’ Dance, Money Spray & Dance Floor Celebration",
-    icon: "✦",
-  },
-  { time: "6:20 PM", event: "Vote of Thanks", icon: "✦" },
-  { time: "6:30 PM", event: "After Party & Free Dance", icon: "♥" },
+  { event: "Cutting of Cake & Feeding", icon: "✦" },
+  { event: "Fun Couple Games & Guest Engagement", icon: "✦" },
+  { event: "Presentation of Gifts", icon: "✦" },
+  { event: "Couple’s Dance with Friends", icon: "♥" },
+  { event: "Couple’s Dance with Parents", icon: "♥" },
+  { event: "Dance, Dance, Dance", icon: "✦" },
+  { event: "Vote of Thanks", icon: "✦" },
 ];
 
 export default function ProgrammePage() {
@@ -102,7 +93,7 @@ export default function ProgrammePage() {
 
           {programme.map((item, index) => (
             <article
-              key={`${item.time}-${item.event}`}
+              key={`${index}-${item.event}`}
               className="group relative mb-6"
             >
               {/* Timeline circle */}
@@ -117,7 +108,7 @@ export default function ProgrammePage() {
 
                   <div>
                     <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#B38D29]">
-                      {item.time}
+                      {String(index + 1).padStart(2, "0")}
                     </p>
 
                     <h3
@@ -128,6 +119,12 @@ export default function ProgrammePage() {
                     >
                       {item.event}
                     </h3>
+
+                    {item.subtitle && (
+                      <p className="mt-2 text-sm italic text-[#8A7D86]">
+                        {item.subtitle}
+                      </p>
+                    )}
                   </div>
 
                   <span className="mt-1 text-sm text-[#D4AF37]">
@@ -141,6 +138,158 @@ export default function ProgrammePage() {
 
         </div>
       </section>
+
+      {/* MENU BUTTON */}
+      <section className="relative px-6 pb-16 text-center">
+        <a
+          href="/menu"
+          className="inline-flex items-center justify-center rounded-full border border-[#D4AF37] bg-[#D4AF37] px-8 py-3 text-sm font-medium uppercase tracking-[0.2em] text-white transition hover:bg-[#B38D29]"
+        >
+          View Menu
+        </a>
+      </section>
+
+      {/* MENU */}
+<section className="relative mx-auto max-w-2xl px-5 pb-20">
+
+  <div className="mb-10 text-center">
+
+    <div className="mb-7 flex items-center justify-center gap-3">
+      <span className="h-px w-12 bg-[#D4AF37]/70" />
+      <span className="text-[#D4AF37]">✦</span>
+      <span className="h-px w-12 bg-[#D4AF37]/70" />
+    </div>
+
+    <p
+      className="text-xl italic text-[#7D688C]"
+      style={{ fontFamily: "Cormorant Garamond, serif" }}
+    >
+      A Taste of Celebration
+    </p>
+
+    <h2
+      className="mt-2 text-4xl text-[#7D688C] md:text-5xl"
+      style={{ fontFamily: "Cormorant Garamond, serif" }}
+    >
+      Wedding Menu
+    </h2>
+
+  </div>
+
+  <div className="space-y-6">
+
+    {/* APPETIZER */}
+    <article className="rounded-[1.5rem] border border-[#D4AF37]/20 bg-white/75 px-6 py-7 shadow-[0_8px_30px_rgba(70,50,60,0.05)] backdrop-blur-sm">
+
+      <h3
+        className="mb-5 text-2xl text-[#7D688C]"
+        style={{ fontFamily: "Cormorant Garamond, serif" }}
+      >
+        Appetizer
+      </h3>
+
+      <div className="space-y-3">
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Small Chops
+        </p>
+
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Chapman
+        </p>
+      </div>
+
+    </article>
+
+    {/* MAIN DISH */}
+    <article className="rounded-[1.5rem] border border-[#D4AF37]/20 bg-white/75 px-6 py-7 shadow-[0_8px_30px_rgba(70,50,60,0.05)] backdrop-blur-sm">
+
+      <h3
+        className="mb-5 text-2xl text-[#7D688C]"
+        style={{ fontFamily: "Cormorant Garamond, serif" }}
+      >
+        Main Dish
+      </h3>
+
+      <div className="space-y-3">
+
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Semo & Egusi Soup
+        </p>
+
+        <div className="flex items-center gap-3">
+          <p className="text-xl text-[#40353D]">
+            <span className="mr-3 text-[#D4AF37]">✦</span>
+            Amala & Ewedu
+          </p>
+
+          <span className="text-[10px] uppercase tracking-[0.15em] text-[#B38D29]">
+            At the Spot
+          </span>
+        </div>
+
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Jollof Rice
+        </p>
+
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Fried Rice
+        </p>
+
+      </div>
+
+    </article>
+
+    {/* SIDES */}
+    <article className="rounded-[1.5rem] border border-[#D4AF37]/20 bg-white/75 px-6 py-7 shadow-[0_8px_30px_rgba(70,50,60,0.05)] backdrop-blur-sm">
+
+      <h3
+        className="mb-5 text-2xl text-[#7D688C]"
+        style={{ fontFamily: "Cormorant Garamond, serif" }}
+      >
+        Sides
+      </h3>
+
+      <p className="text-xl text-[#40353D]">
+        <span className="mr-3 text-[#D4AF37]">✦</span>
+        Tasty Popcorn
+      </p>
+
+    </article>
+
+    {/* PROTEIN */}
+    <article className="rounded-[1.5rem] border border-[#D4AF37]/20 bg-white/75 px-6 py-7 shadow-[0_8px_30px_rgba(70,50,60,0.05)] backdrop-blur-sm">
+
+      <h3
+        className="mb-5 text-2xl text-[#7D688C]"
+        style={{ fontFamily: "Cormorant Garamond, serif" }}
+      >
+        Protein
+      </h3>
+
+      <div className="space-y-3">
+
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Beef
+        </p>
+
+        <p className="text-xl text-[#40353D]">
+          <span className="mr-3 text-[#D4AF37]">✦</span>
+          Chicken
+        </p>
+
+      </div>
+
+    </article>
+
+  </div>
+
+</section>
 
       {/* CLOSING */}
       <section className="relative px-6 pb-20 text-center">
